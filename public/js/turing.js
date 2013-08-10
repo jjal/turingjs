@@ -22,6 +22,7 @@ var TuringSimulation = function(c) {
 	this.encoder.setRepeat(0);
 	this.encoder.setDelay(100);
 	this.encoder.start();
+	this.frameBuffer = [];
 
 
 	
@@ -120,6 +121,7 @@ var TuringSimulation = function(c) {
       	//slap it back on the original canvas
      	ctx.putImageData(imgData,0,0);
      	this.encoder.addFrame(ctx);
+     	this.frameBuffer.push()
 	}
 	this.putPixel = function(imgData, x, y, color)
 	{
@@ -136,7 +138,7 @@ var TuringSimulation = function(c) {
 		 r = Math.cos(c*Math.PI-Math.PI)/2.0+0.5;
 		//cy = Math.cos(c*Math.PI)/2.0+0.5;
 		//ma = Math.cos(c*Math.PI-Math.PI)/2.0+0.5;
-		 return new Array(Math.floor(r*16)*16,Math.floor(g*16)*16,Math.floor(b*16)*16,255);
+		 return new Array(Math.floor(r*3)*128,Math.floor(g*3)*128,Math.floor(b*3)*128,255);
 		//return new Array(cy*255,((cy+ma)/2.0)*255,ma*255,255);
 	}
 	this.fillRandom = function(grid)
@@ -185,6 +187,7 @@ var TuringSimulation = function(c) {
 	this.saveGif = function()
 	{
 		this.encoder.finish(); 
+
 		var binary_gif = this.encoder.stream().getData(); //notice this is different from the as3gif package! 
 		//alert(binary_gif);
 		var data_url = 'data:image/gif;base64,'+encode64(binary_gif);
