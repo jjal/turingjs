@@ -187,9 +187,9 @@ var TuringSimulation = function(c) {
 		this.encoder.finish(); 
 		var binary_gif = this.encoder.stream().getData(); //notice this is different from the as3gif package! 
 		//alert(binary_gif);
-		var data_url = 'data:image/gif;base64,'+b64.encode(binary_gif);
+		var data_url = 'data:image/gif;base64,'+encode64(binary_gif);
 
-		$('<img/>', { src: data_url }).appendTo(document);
+		var img = $('<img />').attr({ 'id': 'savedGif', 'src': data_url }).appendTo($(document));
 
 		this.encoder.start();
 	}

@@ -1,58 +1,18 @@
-var b64 = (function() {
-
-var hash = {'=': 0};
-
-Array.prototype.forEach.call(
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
-    function(c, i){hash[c] = i});
-
-
-function b64decode(s) {
-    var h = hash,
-        i = 0,
-        j = 0,
-        n = s.length,
-        bytes = new Uint8Array(n * 6 / 8),
-        a1, a2, a3, a4;
-
-    for(;i < n; i += 4, j += 3) {
-        a1 = h[s[i]];
-        a2 = h[s[i + 1]];
-        a3 = h[s[i + 2]];
-        a4 = h[s[i + 3]];
-
-        bytes[j] = (a1 << 2) | (a2 >> 4);
-        bytes[j + 1] = (a2 << 4) | (a3 >> 2);
-        bytes[j + 2] = (a3 << 6) | a4;
+function encode64(input) {
+    var output = "", i = 0, l = input.length,
+    key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", 
+    chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+    while (i < l) {
+        chr1 = input.charCodeAt(i++);
+        chr2 = input.charCodeAt(i++);
+        chr3 = input.charCodeAt(i++);
+        enc1 = chr1 >> 2;
+        enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+        enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+        enc4 = chr3 & 63;
+        if (isNaN(chr2)) enc3 = enc4 = 64;
+        else if (isNaN(chr3)) enc4 = 64;
+        output = output + key.charAt(enc1) + key.charAt(enc2) + key.charAt(enc3) + key.charAt(enc4);
     }
-
-    return bytes.subarray(0, j - (s[n - 1] === '=' ? 1 : 0) - (s[n - 2] === '=' ? 1 : 0));
+    return output;
 }
-
-var b64encode = typeof importScripts === 'function' ?
-//worker
-function(bytes) {
-    var dataURL = new FileReaderSync().readAsDataURL(new Blob([bytes])),
-        startPos = dataURL.indexOf(',') + 1;
-
-    return dataURL.slice(startPos);
-} :
-//browser
-function(bytes, callback) {
-    var dataURL, startPos,
-        fr = new FileReader;
-
-    fr.onloadend = function() {
-        dataURL = fr.result;
-        startPos = dataURL.indexOf(',') + 1;
-        callback(dataURL.slice(startPos));
-    };
-    fr.readAsDataURL(new Blob([bytes]));
-};
-
-return {
-    encode: b64encode,
-    decode: b64decode
-};
-
-})();
